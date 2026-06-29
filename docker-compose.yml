@@ -2,22 +2,44 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: pulse
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   api:
-    build: ./api-service
+    build:
+      context: .
+      dockerfile: api-service/Dockerfile
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/pulse
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     depends_on:
       - db
+
+  worker:
+    build:
+      context: .
+      dockerfile: worker-service/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      - db
+
+  notifs:
+    build:
+      context: .
+      dockerfile: notifs-service/Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      ALERT_FROM_EMAIL: ${ALERT_FROM_EMAIL}
+      ALERT_TO_EMAIL: ${ALERT_TO_EMAIL}
 
 volumes:
   postgres_data:
