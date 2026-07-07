@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from shared.database import get_db, engine
-from models import Base, Site, SiteCheck
+from shared.models import Base, Site, SiteCheck
 
 Base.metadata.create_all(bind=engine)
 
