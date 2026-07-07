@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifs
+  template:
+    metadata:
+      labels:
+        app: notifs
+    spec:
+      containers:
+        - name: notifs
+          image: barngoose/pulse-notifs:latest
+          envFrom:
+            - secretRef:
+                name: pulse-secrets
+          ports:
+            - containerPort: 8001
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notifs
+spec:
+  selector:
+    app: notifs
+  ports:
+    - port: 8001
+      targetPort: 8001
+      
