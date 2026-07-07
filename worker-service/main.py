@@ -8,17 +8,6 @@ from shared.models import Site, SiteCheck
 
 NOTIFS_URL = os.getenv("NOTIFS_URL", "http://notifs:8001")
 
-def send_alert(site: Site, reason: str):
-    try:
-        requests.post(f"{NOTIFS_URL}/alert", json={
-            "site_name": site.name,
-            "url": site.url,
-            "reason": reason
-        }, timeout=5)
-        print(f"Alert sent for {site.url}")
-    except Exception as e:
-        print(f"Failed to send alert for {site.url}: {e}")
-
 def ping_site(site: Site, db: Session):
     try:
         response = requests.get(site.url, timeout=10)
@@ -53,6 +42,17 @@ def run_checks():
             ping_site(site, db)
     finally:
         db.close()
+
+def send_alert(site: Site, reason: str):
+    try:
+        requests.post(f"{NOTIFS_URL}/alert", json={
+            "site_name": site.name,
+            "url": site.url,
+            "reason": reason
+        }, timeout=5)
+        print(f"Alert sent for {site.url}")
+    except Exception as e:
+        print(f"Failed to send alert for {site.url}: {e}")
 
 schedule.every(5).minutes.do(run_checks)
 
