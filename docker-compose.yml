@@ -14,6 +14,9 @@ services:
     build:
       context: .
       dockerfile: api-service/Dockerfile
+      platforms:
+        - linux/amd64
+    image: barngoose/pulse-api:latest
     ports:
       - "8000:8000"
     environment:
@@ -25,6 +28,9 @@ services:
     build:
       context: .
       dockerfile: worker-service/Dockerfile
+      platforms:
+        - linux/amd64
+    image: barngoose/pulse-worker:latest
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     depends_on:
@@ -34,6 +40,9 @@ services:
     build:
       context: .
       dockerfile: notifs-service/Dockerfile
+      platforms:
+        - linux/amd64
+    image: barngoose/pulse-notifs:latest
     ports:
       - "8001:8001"
     environment:
